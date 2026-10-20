@@ -12,6 +12,11 @@
         place-items: center;
         background-color: #1a1a1a;
       }
+      #app {
+        display: flex;
+        align-items: center;
+        gap: 24px;
+      }
       
       /* Brættet: 10 kolonner x 20 rækker á 25px */
       #tetris-board {
@@ -42,6 +47,7 @@
   </head>
   <body>
     <main id="app">
+      <button id="start-button">Start</button>
       <!-- Alle 200 felter (20 rækker á 10 felter) skal ligge INDE i tetris-board -->
       <div id="tetris-board">
         <!-- Række 1 -->
