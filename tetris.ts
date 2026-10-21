@@ -60,6 +60,17 @@ for (let row = 0; row < pieces.I.length; row++) {
   }
 }
 */
+function shufflePieces() {
+    const randomPieceKeys = Object.keys(pieces);
+    const randomIndex = Math.floor(Math.random() * randomPieceKeys.length);
+    const randomPieceKey = randomPieceKeys[randomIndex];
+    currentPiece = pieces[randomPieceKey as keyof typeof pieces];
+    pieceClass = `filled-${randomPieceKey}`;
+    pieceX = 3;
+    pieceY = 0;
+    //shufflePieces();
+}
+
 let currentPiece = pieces.I;
 let pieceClass = "filled-I";
 let previousCells: number[] = [];
@@ -112,11 +123,8 @@ function lockAndSpawnPiece() {
         }
     }
     previousCells = []; // Clear the previous cells since the piece is now locked
-    // Spawn a new piece (for simplicity, we will just use the same piece)
-    currentPiece = pieces.I;
-    pieceX = 3;
-    pieceY = 0;
-    drawPiece();
+    
+    shufflePieces();
 }
 
 drawPiece(); // Initial draw of the piece
@@ -131,7 +139,6 @@ const timer = setInterval(() => {
   }
 }, 1000);
   // Clear the previous position of the piece
-
 
 //function shufflePieces() {
 // Example: Mark the first cell as filled
@@ -172,6 +179,8 @@ addEventListener("keydown", (event) => {
                 drawPiece();
             }
             break;
+        case "ArrowUp":
+            console.log("Up arrow pressed");    
         default:
             break;
     }
