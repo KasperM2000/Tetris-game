@@ -126,6 +126,34 @@ function canMoveRight() {
     }
     return true;
 }
+function rotatePiece() {
+    const newPiece = [];
+    const rows = currentPiece.length;
+    const cols = currentPiece[0].length;
+    for (let col = 0; col < cols; col++) {
+        const newRow = [];
+        for (let row = rows - 1; row >= 0; row--) {
+            newRow.push(currentPiece[row][col]);
+        }
+        newPiece.push(newRow);
+    }
+    // Check if the rotated piece can fit in the grid
+    for (let row = 0; row < newPiece.length; row++) {
+        for (let col = 0; col < newPiece[row].length; col++) {
+            if (newPiece[row][col] === 1) {
+                const boardX = pieceX + col;
+                const boardY = pieceY + row;
+                // Check if the cell is out of bounds or filled
+                if (boardX < 0 || boardX >= grid_width || boardY < 0 || boardY >= grid_height || grid[boardY * grid_width + boardX] !== 0) {
+                    return; // Cannot rotate, so exit the function
+                }
+            }
+        }
+    }
+    // If the rotation is valid, update the current piece
+    currentPiece = newPiece;
+    drawPiece();
+}
 function lockAndSpawnPiece() {
     // Lock the current piece into the grid
     for (let row = 0; row < currentPiece.length; row++) {
@@ -141,16 +169,38 @@ function lockAndSpawnPiece() {
 }
 shufflePieces(); // Initial piece selection
 drawPiece(); // Initial draw of the piece
-const timer = setInterval(() => {
-    // Move the piece down by one row
-    if (canMoveDown()) {
-        pieceY++;
-        drawPiece();
-    }
-    else {
-        lockAndSpawnPiece();
-    }
-}, 1000);
+/*const timer = setInterval(() => {
+  // Move the piece down by one row
+  if (canMoveDown()) {
+    pieceY++;
+    drawPiece();
+  } else {
+    lockAndSpawnPiece();
+  }
+}, 1000);*/
+const startButton = document.getElementById("start-button");
+if (!startButton) {
+    throw new Error("Could not find the start-button.");
+}
+startButton.addEventListener("click", () => {
+    console.log("Start button clicked");
+    startGame();
+});
+function startGame() {
+    console.log("Game started");
+    // Add your game logic here
+    const timer = setInterval(() => {
+        console.log("Game tick");
+        if (canMoveDown()) {
+            pieceY++;
+            drawPiece();
+        }
+        else {
+            lockAndSpawnPiece();
+        }
+        // Update game state and render
+    }, 1000);
+}
 // Clear the previous position of the piece
 //function shufflePieces() {
 // Example: Mark the first cell as filled
@@ -191,6 +241,8 @@ addEventListener("keydown", (event) => {
             break;
         case "ArrowUp":
             console.log("Up arrow pressed");
+            rotatePiece();
+            break;
         default:
             break;
     }
