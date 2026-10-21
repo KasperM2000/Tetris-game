@@ -57,7 +57,7 @@ function shufflePieces() {
     pieceClass = `filled-${randomPieceKey}`;
     pieceX = 3;
     pieceY = 0;
-    shufflePieces();
+    //shufflePieces();
 }
 let currentPiece = pieces.I;
 let pieceClass = "filled-I";
@@ -96,6 +96,36 @@ function canMoveDown() {
     }
     return true;
 }
+function canMoveLeft() {
+    for (let row = 0; row < currentPiece.length; row++) {
+        for (let col = 0; col < currentPiece[row].length; col++) {
+            if (currentPiece[row][col] === 1) {
+                const nextBoardX = pieceX + col - 1; // Check the cell to the left
+                const boardY = pieceY + row;
+                // Check if the cell to the left is out of bounds or filled
+                if (nextBoardX < 0 || grid[boardY * grid_width + nextBoardX] !== 0) {
+                    return false;
+                }
+            }
+        }
+    }
+    return true;
+}
+function canMoveRight() {
+    for (let row = 0; row < currentPiece.length; row++) {
+        for (let col = 0; col < currentPiece[row].length; col++) {
+            if (currentPiece[row][col] === 1) {
+                const nextBoardX = pieceX + col + 1; // Check the cell to the right
+                const boardY = pieceY + row;
+                // Check if the cell to the right is out of bounds or filled
+                if (nextBoardX >= grid_width || grid[boardY * grid_width + nextBoardX] !== 0) {
+                    return false;
+                }
+            }
+        }
+    }
+    return true;
+}
 function lockAndSpawnPiece() {
     // Lock the current piece into the grid
     for (let row = 0; row < currentPiece.length; row++) {
@@ -107,9 +137,9 @@ function lockAndSpawnPiece() {
         }
     }
     previousCells = []; // Clear the previous cells since the piece is now locked
-    // Spawn a new piece (for simplicity, we will just use the same piece)
     shufflePieces();
 }
+shufflePieces(); // Initial piece selection
 drawPiece(); // Initial draw of the piece
 const timer = setInterval(() => {
     // Move the piece down by one row
@@ -139,14 +169,14 @@ for (let i = 0; i < grid.length; i++) {
 addEventListener("keydown", (event) => {
     switch (event.key) {
         case "ArrowLeft":
-            if (pieceX > 0) { // Check if the piece can move left
+            if (pieceX > 0 && canMoveLeft()) { // Check if the piece can move left
                 console.log("Left arrow pressed");
                 pieceX--;
                 drawPiece();
             }
             break;
         case "ArrowRight":
-            if (pieceX < grid_width - currentPiece[0].length) { // Check if the piece can move right
+            if (pieceX < grid_width - currentPiece[0].length && canMoveRight()) { // Check if the piece can move right
                 console.log("Right arrow pressed");
                 pieceX++;
                 drawPiece();
@@ -159,6 +189,8 @@ addEventListener("keydown", (event) => {
                 drawPiece();
             }
             break;
+        case "ArrowUp":
+            console.log("Up arrow pressed");
         default:
             break;
     }
