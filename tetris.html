@@ -17,6 +17,26 @@
         align-items: center;
         gap: 24px;
       }
+
+      .game-area {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 12px;
+        order: 1;
+      }
+
+      #held-piece-label {
+        order: 0;
+      }
+
+      .game-controls {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 20px;
+        order: 2;
+      }
       
       /* Brættet: 10 kolonner x 20 rækker á 25px */
       #tetris-board {
@@ -28,7 +48,7 @@
         /* farven til boardet*/
         background-color: #111;
       }
-      #score {
+      .score-display {
         color: white;
         font-size: 24px;
       }
@@ -42,11 +62,6 @@
         font-size: 16px;
         cursor: pointer;
       }
-      #app {
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-      }
       .cell.filled-L { background-color: #e9a207;}
       .cell.filled-J { background-color: #0d05e7;}
       .cell.filled-I { background-color: #44d7e8;}
@@ -54,15 +69,41 @@
       .cell.filled-T { background-color: #6e0495;}
       .cell.filled-S { background-color: #02fa02;}
       .cell.filled-Z { background-color: #e70a0a;}
+
+      #held-piece-label {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        align-self: center;
+        gap: 10px;
+        border: 2px solid #555;
+        background-color: #111;
+        color: white;
+        padding: 12px;
+      }
+
+      .held-piece-preview {
+        display: grid;
+        grid-template-columns: repeat(4, 25px);
+        grid-template-rows: repeat(4, 25px);
+      }
       
     </style>
   </head>
   <body>
-    <div>Score: <span id="score">0</span></div>
     <main id="app">
-      <button id="start-button">Start</button>
-      <!-- Alle 200 felter (20 rækker á 10 felter) skal ligge INDE i tetris-board -->
-      <div id="tetris-board">
+      <aside id="held-piece-label">
+        <h2>Held Piece</h2>
+        <div class="held-piece-preview">
+          <div class="cell"></div><div class="cell"></div><div class="cell"></div><div class="cell"></div>
+          <div class="cell"></div><div class="cell"></div><div class="cell"></div><div class="cell"></div>
+          <div class="cell"></div><div class="cell"></div><div class="cell"></div><div class="cell"></div>
+          <div class="cell"></div><div class="cell"></div><div class="cell"></div><div class="cell"></div>
+        </div>
+      </aside>
+      <section class="game-area">
+        <!-- Alle 200 felter (20 rækker á 10 felter) skal ligge INDE i tetris-board -->
+        <div id="tetris-board">
         <!-- Række 1 -->
         <div class="cell"></div><div class="cell"></div><div class="cell"></div><div class="cell"></div><div class="cell"></div><div class="cell"></div><div class="cell"></div><div class="cell"></div><div class="cell"></div><div class="cell"></div>
         <!-- Række 2 -->
@@ -103,7 +144,12 @@
         <div class="cell"></div><div class="cell"></div><div class="cell"></div><div class="cell"></div><div class="cell"></div><div class="cell"></div><div class="cell"></div><div class="cell"></div><div class="cell"></div><div class="cell"></div>
         <!-- Række 20 -->
         <div class="cell"></div><div class="cell"></div><div class="cell"></div><div class="cell"></div><div class="cell"></div><div class="cell"></div><div class="cell"></div><div class="cell"></div><div class="cell"></div><div class="cell"></div>
-      </div>
+        </div>
+      </section>
+      <aside class="game-controls">
+        <div class="score-display">Score: <span id="score">0</span></div>
+        <button id="start-button">Start</button>
+      </aside>
     </main>
     <span id="output"></span>
 

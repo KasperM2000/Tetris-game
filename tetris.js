@@ -3,6 +3,7 @@ const tetrisBoard = document.getElementById("tetris-board");
 if (!tetrisBoard) {
     throw new Error("Could not find the tetris-board div.");
 }
+let gameTimer;
 // Define the grid dimensions
 const grid_width = 10;
 const grid_height = 20;
@@ -46,6 +47,75 @@ function drawPiece() {
                 const index = boardY * grid_width + boardX;
                 arrayOfCells[index].classList.add(pieceClass);
                 previousCells.push(index);
+            }
+        }
+    }
+}
+function isGameOver() {
+    for (let row = 0; row < currentPiece.length; row++) {
+        for (let col = 0; col < currentPiece[row].length; col++) {
+            if (currentPiece[row][col] === 1) {
+                const boardX = pieceX + col;
+                const boardY = pieceY + row;
+                // Check if the cell is out of bounds or filled
+                if (boardY < 0 || boardY >= grid_height || boardX < 0 || boardX >= grid_width || grid[boardY * grid_width + boardX] !== 0) {
+                    return true;
+                    alert("Game Over! Your score: " + score);
+                    // Game over condition met
+                }
+            }
+        }
+    }
+    return false; // No game over condition met
+}
+let heldPiece = null;
+let holdUsed = false; // Track if the hold action has been used for the current piece
+function holdPiece() {
+    // Implement the logic to hold the current piece
+    // This could involve storing the current piece in a separate variable
+    // and allowing the player to swap it with the held piece later.
+    console.log("Hold piece action triggered");
+    if (holdUsed) {
+        console.log("Hold action already used for this piece.");
+        return; // Prevent holding again for the same piece
+    }
+    for (const index of previousCells) {
+        arrayOfCells[index].classList.remove(pieceClass);
+    }
+    previousCells = [];
+    if (heldPiece === null) {
+        heldPiece = { shape: currentPiece, colorClass: pieceClass };
+        shufflePieces(); // Get a new piece after holding
+    }
+    else {
+        const temp = { shape: currentPiece, colorClass: pieceClass };
+        currentPiece = heldPiece.shape;
+        pieceClass = heldPiece.colorClass;
+        heldPiece = temp;
+    }
+    pieceX = 3; // Reset position for the new piece
+    pieceY = 0;
+    holdUsed = false; // Mark that the hold action has been used
+    drawPiece();
+}
+const heldPreview = document.querySelector(".held-piece-preview");
+if (!heldPreview) {
+    throw new Error("Could not find the held-piece preview.");
+}
+const heldPreviewCells = Array.from(heldPreview.querySelectorAll(".cell"));
+function drawHeldPiece() {
+    for (const cell of heldPreviewCells) {
+        cell.className = "cell";
+    }
+    if (heldPiece === null)
+        return;
+    const offsetX = Math.floor((4 - heldPiece.shape[0].length) / 2);
+    const offsetY = Math.floor((4 - heldPiece.shape.length) / 2);
+    for (let row = 0; row < heldPiece.shape.length; row++) {
+        for (let col = 0; col < heldPiece.shape[row].length; col++) {
+            if (heldPiece.shape[row][col] === 1) {
+                const index = (row + offsetY) * 4 + col + offsetX;
+                heldPreviewCells[index].classList.add(heldPiece.colorClass);
             }
         }
     }
@@ -154,6 +224,16 @@ function lockAndSpawnPiece() {
         updateScore(linesCleared); // Update the score based on the number of lines cleared
     }
     shufflePieces();
+    // Indsæt check for game over condition here if needed
+    if (isGameOver()) {
+        if (gameTimer !== undefined) {
+            clearInterval(gameTimer);
+            gameTimer = undefined;
+        }
+        alert("Game Over! Your score: " + score);
+        return; // Exit the function to prevent further execution
+    }
+    holdUsed = false; // Reset hold usage for the new piece
     drawPiece();
 }
 shufflePieces(); // Initial piece selection
@@ -214,10 +294,23 @@ startButton.addEventListener("click", () => {
     startGame();
 });
 function startGame() {
-    console.log("Game started");
-    // Add your game logic here
-    const timer = setInterval(() => {
-        console.log("Game tick");
+    if (!scoreElement) {
+        throw new Error("Score element not found.");
+    }
+    if (gameTimer !== undefined) {
+        clearInterval(gameTimer);
+    }
+    for (let i = 0; i < grid.length; i++) {
+        grid[i] = 0;
+        arrayOfCells[i].className = "cell";
+    }
+    score = 0;
+    scoreElement.textContent = "0";
+    previousCells = [];
+    shufflePieces();
+    drawPiece();
+    gameTimer = window.setInterval(() => {
+        // Keep your existing timer code here
         if (canMoveDown()) {
             pieceY++;
             drawPiece();
@@ -225,9 +318,23 @@ function startGame() {
         else {
             lockAndSpawnPiece();
         }
+    }, 1000);
+}
+/*function startGame() {
+    console.log("Game started");
+    // Add your game logic here
+    gameTimer = window.setInterval(() => {
+        console.log("Game tick");
+        if (canMoveDown()) {
+            pieceY++;
+            drawPiece();
+        } else {
+            lockAndSpawnPiece();
+        }
         // Update game state and render
     }, 1000);
 }
+*/
 // Clear the previous position of the piece
 // For loop to iterate through the grid and update the cell classes based on the grid values
 for (let i = 0; i < grid.length; i++) {
@@ -273,6 +380,10 @@ addEventListener("keydown", (event) => {
             }
             drawPiece();
             lockAndSpawnPiece();
+            break;
+        case "c":
+            console.log("C key pressed");
+            holdPiece();
             break;
         default:
             break;
