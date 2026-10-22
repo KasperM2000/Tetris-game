@@ -95,6 +95,21 @@ function canMoveRight() {
     }
     return true;
 }
+function canMoveStraightDown() {
+    for (let row = 0; row < currentPiece.length; row++) {
+        for (let col = 0; col < currentPiece[row].length; col++) {
+            if (currentPiece[row][col] === 1) {
+                const boardX = pieceX + col;
+                const nextBoardY = pieceY + row + 1; // Check the cell below
+                // Check if the cell below is out of bounds or filled
+                if (nextBoardY >= grid_height || grid[nextBoardY * grid_width + boardX] !== 0) {
+                    return false;
+                }
+            }
+        }
+    }
+    return true;
+}
 function rotatePiece() {
     const newPiece = [];
     const rows = currentPiece.length;
@@ -134,14 +149,19 @@ function lockAndSpawnPiece() {
         }
     }
     previousCells = []; // Clear the previous cells since the piece is now locked
-    removeLines(); // Check for any full lines after locking the piece
+    const linesCleared = removeLines(); // Check for and remove any full lines
+    if (linesCleared > 0) {
+        updateScore(linesCleared); // Update the score based on the number of lines cleared
+    }
     shufflePieces();
+    drawPiece();
 }
 shufflePieces(); // Initial piece selection
 drawPiece(); // Initial draw of the piece
 //Tjekker om der er fulde linjer og fjerner dem ved at sætte dem til 0 i grid arrayet og fjerne filled klassen fra cellerne
 function removeLines() {
-    for (let row = 0; row < grid_height; row++) {
+    let linesCleared = 0;
+    for (let row = grid_height - 1; row >= 0; row--) {
         let isFullLine = true;
         for (let col = 0; col < grid_width; col++) {
             if (grid[row * grid_width + col] === 0) {
@@ -149,36 +169,41 @@ function removeLines() {
                 break;
             }
         }
-        if (isFullLine) {
-            // Remove the line by setting it to 0 in the grid
+        if (!isFullLine)
+            continue;
+        linesCleared++;
+        // Shift each row above the cleared row down by one.
+        for (let rowAbove = row; rowAbove > 0; rowAbove--) {
             for (let col = 0; col < grid_width; col++) {
-                grid[row * grid_width + col] = 0;
-            }
-            // Remove the filled class from the cells
-            for (let col = 0; col < grid_width; col++) {
-                const index = row * grid_width + col;
-                arrayOfCells[index].classList.remove("filled-L", "filled-J", "filled-I", "filled-O", "filled-T", "filled-S", "filled-Z");
-            }
-            // Move all rows above down by one
-            for (let r = row; r > 0; r--) {
-                for (let col = 0; col < grid_width; col++) {
-                    grid[r * grid_width + col] = grid[(r - 1) * grid_width + col];
-                    const index = r * grid_width + col;
-                    const aboveIndex = (r - 1) * grid_width + col;
-                    arrayOfCells[index].className = arrayOfCells[aboveIndex].className;
-                }
-            }
-            // Clear the top row
-            for (let col = 0; col < grid_width; col++) {
-                grid[col] = 0;
-                arrayOfCells[col].className = "cell";
+                const destination = rowAbove * grid_width + col;
+                const source = (rowAbove - 1) * grid_width + col;
+                grid[destination] = grid[source];
+                arrayOfCells[destination].className =
+                    arrayOfCells[source].className;
             }
         }
+        // Empty the top row.
+        for (let col = 0; col < grid_width; col++) {
+            grid[col] = 0;
+            arrayOfCells[col].className = "cell";
+        }
+        // Check this row again in case another full row shifted into it.
+        row++;
     }
+    return linesCleared;
 }
-let scoreValue = document.getElementById("score");
-if (!scoreValue) {
-    throw new Error("Could not find the score span.");
+const scoreElement = document.getElementById("score");
+if (!scoreElement) {
+    throw new Error("Could not find the score element.");
+}
+let score = 0;
+function updateScore(linesCleared) {
+    if (!scoreElement) {
+        throw new Error("Score element not found.");
+    }
+    const pointsPerLine = [0, 100, 300, 500, 800]; // Points for clearing 0, 1, 2, 3, or 4 lines
+    score += pointsPerLine[linesCleared] || 0;
+    scoreElement.textContent = String(score);
 }
 const startButton = document.getElementById("start-button");
 if (!startButton) {
@@ -240,6 +265,14 @@ addEventListener("keydown", (event) => {
         case "ArrowUp":
             console.log("Up arrow pressed");
             rotatePiece();
+            break;
+        case " ":
+            console.log("Space bar pressed");
+            while (canMoveStraightDown()) {
+                pieceY++;
+            }
+            drawPiece();
+            lockAndSpawnPiece();
             break;
         default:
             break;
