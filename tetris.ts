@@ -110,7 +110,8 @@ function holdPiece(): void {
     }
     pieceX = 3; // Reset position for the new piece
     pieceY = 0;
-    holdUsed = false; // Mark that the hold action has been used
+    holdUsed = true;
+    drawHeldPiece();
     drawPiece();
 }
 
@@ -140,6 +141,7 @@ function drawHeldPiece(): void{
         }
     }
 }
+drawHeldPiece();
 
 function canMoveDown(): boolean {
     for (let row = 0; row < currentPiece.length; row++) {
@@ -357,6 +359,9 @@ function startGame() {
     score = 0;
     scoreElement.textContent = "0";
     previousCells = [];
+    heldPiece = null;
+    holdUsed = false;
+    drawHeldPiece();
 
     shufflePieces();
     drawPiece();
