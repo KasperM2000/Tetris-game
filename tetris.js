@@ -302,6 +302,7 @@ const difficultyIntervals = {
     normal: 1000,
     hard: 500,
     extreme: 250,
+    impossible: 100,
 };
 function startGameTimer() {
     if (gameTimer !== undefined) {
@@ -324,7 +325,8 @@ difficultyOptions.forEach((option) => {
         if (option.value !== "easy" &&
             option.value !== "normal" &&
             option.value !== "hard" &&
-            option.value !== "extreme") {
+            option.value !== "extreme" &&
+            option.value !== "impossible") {
             throw new Error(`Unknown difficulty: ${option.value}`);
         }
         selectedDifficulty = option.value;

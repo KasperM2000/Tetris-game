@@ -350,7 +350,7 @@ if (difficultyOptions.length === 0) {
     throw new Error("Could not find the difficulty options.");
 }
 
-type Difficulty = "easy" | "normal" | "hard" | "extreme";
+type Difficulty = "easy" | "normal" | "hard" | "extreme" | "impossible";
 let selectedDifficulty: Difficulty = "normal";
 
 const difficultyIntervals = {
@@ -358,6 +358,7 @@ const difficultyIntervals = {
     normal: 1000,
     hard: 500,
     extreme: 250,
+    impossible: 100,
 } satisfies Record<Difficulty, number>;
 
 function startGameTimer(): void {
@@ -382,7 +383,8 @@ difficultyOptions.forEach((option) => {
             option.value !== "easy" &&
             option.value !== "normal" &&
             option.value !== "hard" &&
-            option.value !== "extreme"
+            option.value !== "extreme" &&
+            option.value !== "impossible"
         ) {
             throw new Error(`Unknown difficulty: ${option.value}`);
         }
