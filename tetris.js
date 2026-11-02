@@ -71,9 +71,6 @@ function isGameOver() {
 let heldPiece = null;
 let holdUsed = false; // Track if the hold action has been used for the current piece
 function holdPiece() {
-    // Implement the logic to hold the current piece
-    // This could involve storing the current piece in a separate variable
-    // and allowing the player to swap it with the held piece later.
     console.log("Hold piece action triggered");
     if (holdUsed) {
         console.log("Hold action already used for this piece.");
@@ -295,6 +292,47 @@ startButton.addEventListener("click", () => {
     console.log("Start button clicked");
     startGame();
 });
+const difficultyOptions = document.querySelectorAll('input[name="difficulty"]');
+if (difficultyOptions.length === 0) {
+    throw new Error("Could not find the difficulty options.");
+}
+let selectedDifficulty = "normal";
+const difficultyIntervals = {
+    easy: 1500,
+    normal: 1000,
+    hard: 500,
+    extreme: 250,
+};
+function startGameTimer() {
+    if (gameTimer !== undefined) {
+        clearInterval(gameTimer);
+    }
+    gameTimer = window.setInterval(() => {
+        if (canMoveDown()) {
+            pieceY++;
+            drawPiece();
+        }
+        else {
+            lockAndSpawnPiece();
+        }
+    }, difficultyIntervals[selectedDifficulty]);
+}
+difficultyOptions.forEach((option) => {
+    option.addEventListener("change", () => {
+        if (!option.checked)
+            return;
+        if (option.value !== "easy" &&
+            option.value !== "normal" &&
+            option.value !== "hard" &&
+            option.value !== "extreme") {
+            throw new Error(`Unknown difficulty: ${option.value}`);
+        }
+        selectedDifficulty = option.value;
+        if (gameTimer !== undefined) {
+            startGameTimer();
+        }
+    });
+});
 function startGame() {
     if (!scoreElement) {
         throw new Error("Score element not found.");
@@ -312,36 +350,10 @@ function startGame() {
     heldPiece = null;
     holdUsed = false;
     drawHeldPiece();
-
     shufflePieces();
     drawPiece();
-    gameTimer = window.setInterval(() => {
-        // Keep your existing timer code here
-        if (canMoveDown()) {
-            pieceY++;
-            drawPiece();
-        }
-        else {
-            lockAndSpawnPiece();
-        }
-    }, 1000);
+    startGameTimer();
 }
-/*function startGame() {
-    console.log("Game started");
-    // Add your game logic here
-    gameTimer = window.setInterval(() => {
-        console.log("Game tick");
-        if (canMoveDown()) {
-            pieceY++;
-            drawPiece();
-        } else {
-            lockAndSpawnPiece();
-        }
-        // Update game state and render
-    }, 1000);
-}
-*/
-// Clear the previous position of the piece
 // For loop to iterate through the grid and update the cell classes based on the grid values
 for (let i = 0; i < grid.length; i++) {
     const cell = arrayOfCells[i];

@@ -64,6 +64,9 @@ function drawPiece() {
         }
     }
 }
+
+
+
 function isGameOver() {
     for (let row = 0; row < currentPiece.length; row++) {
         for (let col = 0; col < currentPiece[row].length; col++) {
@@ -86,9 +89,6 @@ function isGameOver() {
 let heldPiece: { shape: number[][]; colorClass: string } | null = null;
 let holdUsed = false; // Track if the hold action has been used for the current piece
 function holdPiece(): void {
-    // Implement the logic to hold the current piece
-    // This could involve storing the current piece in a separate variable
-    // and allowing the player to swap it with the held piece later.
     console.log("Hold piece action triggered");
     if (holdUsed) {
         console.log("Hold action already used for this piece.");
@@ -343,6 +343,57 @@ startButton.addEventListener("click", () => {
     startGame();
 });
 
+const difficultyOptions = document.querySelectorAll<HTMLInputElement>(
+    'input[name="difficulty"]'
+);
+if (difficultyOptions.length === 0) {
+    throw new Error("Could not find the difficulty options.");
+}
+
+type Difficulty = "easy" | "normal" | "hard" | "extreme";
+let selectedDifficulty: Difficulty = "normal";
+
+const difficultyIntervals = {
+    easy: 1500,
+    normal: 1000,
+    hard: 500,
+    extreme: 250,
+} satisfies Record<Difficulty, number>;
+
+function startGameTimer(): void {
+    if (gameTimer !== undefined) {
+        clearInterval(gameTimer);
+    }
+
+    gameTimer = window.setInterval(() => {
+        if (canMoveDown()) {
+            pieceY++;
+            drawPiece();
+        } else {
+            lockAndSpawnPiece();
+        }
+    }, difficultyIntervals[selectedDifficulty]);
+}
+
+difficultyOptions.forEach((option) => {
+    option.addEventListener("change", () => {
+        if (!option.checked) return;
+        if (
+            option.value !== "easy" &&
+            option.value !== "normal" &&
+            option.value !== "hard" &&
+            option.value !== "extreme"
+        ) {
+            throw new Error(`Unknown difficulty: ${option.value}`);
+        }
+
+        selectedDifficulty = option.value;
+        if (gameTimer !== undefined) {
+            startGameTimer();
+        }
+    });
+});
+
 function startGame() {
     if (!scoreElement) {
         throw new Error("Score element not found.");
@@ -366,32 +417,9 @@ function startGame() {
     shufflePieces();
     drawPiece();
 
-    gameTimer = window.setInterval(() => {
-        // Keep your existing timer code here
-        if (canMoveDown()) {
-            pieceY++;
-            drawPiece();
-        } else {
-            lockAndSpawnPiece();
-        }
-    }, 1000);
+    startGameTimer();
 }
-/*function startGame() {
-    console.log("Game started");
-    // Add your game logic here
-    gameTimer = window.setInterval(() => {
-        console.log("Game tick");
-        if (canMoveDown()) {
-            pieceY++;
-            drawPiece();
-        } else {
-            lockAndSpawnPiece();
-        }
-        // Update game state and render
-    }, 1000);
-}
-*/
-// Clear the previous position of the piece
+
 
 
 

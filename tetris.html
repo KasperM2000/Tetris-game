@@ -62,6 +62,15 @@
         font-size: 16px;
         cursor: pointer;
       }
+
+      .difficulty-selector {
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+        margin: 0;
+        color: white;
+      }
+
       .cell.filled-L { background-color: #e9a207;}
       .cell.filled-J { background-color: #0d05e7;}
       .cell.filled-I { background-color: #44d7e8;}
@@ -149,6 +158,13 @@
       <aside class="game-controls">
         <div class="score-display">Score: <span id="score">0</span></div>
         <button id="start-button">Start</button>
+        <fieldset class="difficulty-selector">
+          <legend>Select difficulty</legend>
+          <label><input type="radio" name="difficulty" value="easy"> Easy</label>
+          <label><input type="radio" name="difficulty" value="normal" checked> Normal</label>
+          <label><input type="radio" name="difficulty" value="hard"> Hard</label>
+          <label><input type="radio" name="difficulty" value="extreme"> Extreme</label>
+        </fieldset>
       </aside>
     </main>
     <span id="output"></span>
