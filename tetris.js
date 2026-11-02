@@ -275,14 +275,40 @@ const scoreElement = document.getElementById("score");
 if (!scoreElement) {
     throw new Error("Could not find the score element.");
 }
+const highScoreElement = document.getElementById("high-score");
+if (!highScoreElement) {
+    throw new Error("Could not find the high-score element.");
+}
+const highScoreCookieName = "tetrisHighScore";
+function readHighScore() {
+    const cookie = document.cookie
+        .split(";")
+        .map((entry) => entry.trim())
+        .find((entry) => entry.startsWith(`${highScoreCookieName}=`));
+    if (!cookie)
+        return 0;
+    const value = Number(cookie.slice(highScoreCookieName.length + 1));
+    return Number.isSafeInteger(value) && value >= 0 ? value : 0;
+}
 let score = 0;
+let highScore = readHighScore();
+highScoreElement.textContent = String(highScore);
 function updateScore(linesCleared) {
     if (!scoreElement) {
         throw new Error("Score element not found.");
     }
+    if (!highScoreElement) {
+        throw new Error("High-score element not found.");
+    }
     const pointsPerLine = [0, 100, 300, 500, 800]; // Points for clearing 0, 1, 2, 3, or 4 lines
     score += pointsPerLine[linesCleared] || 0;
     scoreElement.textContent = String(score);
+    if (score > highScore) {
+        highScore = score;
+        highScoreElement.textContent = String(highScore);
+        document.cookie =
+            `${highScoreCookieName}=${highScore}; max-age=31536000; path=/; SameSite=Lax`;
+    }
 }
 const startButton = document.getElementById("start-button");
 if (!startButton) {
