@@ -317,6 +317,7 @@ if (!startButton) {
 startButton.addEventListener("click", () => {
     console.log("Start button clicked");
     startGame();
+    startButton.blur();
 });
 const difficultyOptions = document.querySelectorAll('input[name="difficulty"]');
 if (difficultyOptions.length === 0) {
